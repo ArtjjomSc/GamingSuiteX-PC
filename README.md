@@ -4,9 +4,11 @@
 
 > 🇬🇧 *Free Windows gaming tool: hardware diagnostics, one-click tuning, automatic FPS / 1%-low measurement for every game, plus a phone/web dashboard. UI is currently German only.*
 
-<!-- Screenshots: Bilder in docs/screenshots/ ablegen und hier einbinden, z. B.
-![Dashboard](docs/screenshots/dashboard.png)
--->
+## Screenshots
+
+| PC-Programm | Handy-App |
+|---|---|
+| ![Dashboard](docs/screenshots/dashboard.png) | <img src="docs/screenshots/app.jpg" width="260"> |
 
 ---
 
