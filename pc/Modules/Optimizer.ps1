@@ -125,73 +125,8 @@ function Clear-CacheFiles {
     }
 }
 
-function Set-PowerPlanToHigh {
-    param()
-    
-    try {
-        $powerPlans = Get-CimInstance -Namespace root\cimv2\power -ClassName Win32_PowerPlan -ErrorAction SilentlyContinue
-        $highPerf = $powerPlans | Where-Object { $_.ElementName -like "*chstleistung*" -or $_.ElementName -like "*High Performance*" } | Select-Object -First 1
-        
-        if ($highPerf) {
-            Invoke-CimMethod -InputObject $highPerf -MethodName Activate | Out-Null
-            return $true
-        }
-    }
-    catch { }
-    
-    return $false
-}
-
-function Enable-GameMode {
-    param()
-    
-    try {
-        $regPath = "HKCU:\Software\Microsoft\GameBar"
-        if (-not (Test-Path $regPath)) {
-            New-Item -Path $regPath -Force | Out-Null
-        }
-        Set-ItemProperty -Path $regPath -Name "AutoGameModeEnabled" -Value 1 -ErrorAction Stop
-        return $true
-    }
-    catch {
-        return $false
-    }
-}
-
-function Disable-UnnecessaryServices {
-    param()
-    
-    # Nur nicht-kritische Services, die Gaming beeinflussen
-    $servicesDisable = @(
-        "DiagTrack",              # Diagnostics Tracking Service
-        "dmwappushservice",       # dmwappushservice
-        "Spooler",                # Print Spooler
-        "WMPNetworkSvc",          # Windows Media Player Network Sharing Service
-        "WSearch"                 # Windows Search (optional)
-    )
-    
-    $disabled = @()
-    $errors = @()
-    
-    foreach ($service in $servicesDisable) {
-        try {
-            $svc = Get-Service -Name $service -ErrorAction SilentlyContinue
-            if ($svc -and $svc.Status -eq "Running") {
-                Stop-Service -Name $service -Force -ErrorAction Stop
-                Set-Service -Name $service -StartupType Disabled -ErrorAction Stop
-                $disabled += $service
-            }
-        }
-        catch {
-            $errors += $service
-        }
-    }
-    
-    return @{
-        Disabled = $disabled
-        Errors = $errors
-    }
-}
+# Hinweis: Energieplan, Spielmodus usw. werden nur noch ueber SystemTuning.ps1 gesetzt
+# (mit Backup, einzeln abwaehlbar). Dienste werden von GamingSuite X nicht veraendert.
 
 function Get-StorageAnalysis {
     param()

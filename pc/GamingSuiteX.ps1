@@ -10,7 +10,7 @@ if (-not $isAdmin) {
     Start-Sleep 2
 }
 
-$Version = "11.4"
+$Version = "11.5"
 
 # Konsolen-Protokoll (fuer Fehlerberichte), die letzten 10 behalten
 $consoleLogDir = Join-Path $env:APPDATA "GamingSuiteX\logs"

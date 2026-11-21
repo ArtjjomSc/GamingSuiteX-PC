@@ -227,7 +227,7 @@ $script:TuningDefinitions = @(
 
     @{
         Id = 'powerplan'; Category = 'Energie'; Name = 'Energiesparplan Hoechstleistung / Ultimativ'
-        Recommended = 'Ultimative Leistung'; OneClick = $true; Restart = $false
+        Recommended = 'Optional: Hoechstleistung - kostet im Leerlauf spuerbar mehr Strom (je nach PC ca. 10-50 W)'; OneClick = $false; Restart = $false
         Check = {
             $a = Get-GSXActivePowerScheme
             if (-not $a) { return @{ Ok = $null; Current = 'unbekannt' } }
@@ -259,7 +259,7 @@ $script:TuningDefinitions = @(
 
     @{
         Id = 'cpupark'; Category = 'CPU'; Name = 'CPU-Mindestleistung 100 % / kein Core-Parking'
-        Recommended = 'Min. 100 %, alle Kerne aktiv'; OneClick = $true; Restart = $false
+        Recommended = 'Optional: nur bei Mikrorucklern - CPU taktet nie herunter, deutlich mehr Leerlauf-Verbrauch'; OneClick = $false; Restart = $false
         Check = {
             $a = Get-GSXActivePowerScheme
             if (-not $a) { return @{ Ok = $null; Current = 'unbekannt' } }
@@ -283,7 +283,7 @@ $script:TuningDefinitions = @(
 
     @{
         Id = 'throttling'; Category = 'CPU'; Name = 'Windows Power Throttling aus'
-        Recommended = 'Aus (vor allem bei Intel 12. Gen+ mit P/E-Kernen)'; OneClick = $true; Restart = $true
+        Recommended = 'Optional: Aus (Intel 12. Gen+ mit P/E-Kernen) - etwas mehr Verbrauch, bei Laptops weniger Akkulaufzeit'; OneClick = $false; Restart = $true
         Check = {
             $v = Get-GSXRegValue 'HKLM:\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling' 'PowerThrottlingOff'
             @{ Ok = ($v -eq 1); Current = if ($v -eq 1) { 'Aus' } else { 'An (Standard)' } }

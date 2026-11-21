@@ -1,5 +1,11 @@
 # Änderungen
 
+## 11.5 – Optimizer zurückhaltender (nach Nutzer-Feedback)
+
+- Alte, ungenutzte Funktion entfernt, die Dienste wie Druckerwarteschlange und Windows-Suche deaktiviert hätte. GamingSuite X verändert keine Windows-Dienste.
+- Energiesparplan „Höchstleistung/Ultimativ“, CPU-Mindestleistung 100 % / Core-Parking und Power Throttling sind nicht mehr Teil von „Alles optimieren“, sondern optional – mit Hinweis auf den höheren Stromverbrauch im Leerlauf.
+- Warnhinweis zum Stromverbrauch, wenn diese Punkte einzeln ausgewählt werden.
+
 ## 11.4 – erste öffentliche Version (Beta)
 - GPU-Auslastung und VRAM für **AMD und Intel** (Windows-Leistungsindikatoren, wie im Task-Manager)
 - Optimizer: Mausbeschleunigung und Netzwerk-Tweaks sind jetzt **optional**, Status „OPTIONAL“ statt „NICHT AKTIV“

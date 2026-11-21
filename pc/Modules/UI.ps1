@@ -1203,8 +1203,10 @@ function Start-GamingSuiteUI {
 
     $tuneAllButton.Add_Click({
         $answer = [System.Windows.Forms.MessageBox]::Show(
-            "Alle empfohlenen Gaming-Einstellungen werden aktiviert (Energie, CPU, GPU, Spiele-Prioritaet, Game DVR).`n`n" +
-            "NICHT veraendert werden: Speicher-Integritaet und die optionalen Punkte (Maus, Netzwerk) -`n" +
+            "Es werden nur die risikoarmen Einstellungen gesetzt (Spielmodus, GPU-Planung, Spiele-Prioritaet, Game DVR aus).`n`n" +
+            "NICHT veraendert werden: Energiesparplan, CPU-Mindestleistung, Power Throttling (mehr Stromverbrauch),`n" +
+            "Speicher-Integritaet und die uebrigen optionalen Punkte (Maus, Netzwerk). Windows-Dienste werden nie angefasst.`n" +
+            "Optionale Punkte kannst du einzeln ankreuzen und mit 'Auswahl optimieren' setzen.`n" +
             "die kannst du einzeln ankreuzen und mit 'Auswahl optimieren' setzen.`n" +
             "Vorher wird ein Backup angelegt - alles laesst sich zuruecksetzen.`n`nFortfahren?",
             "Alles optimieren", 'YesNo', 'Question')
@@ -1225,6 +1227,14 @@ function Start-GamingSuiteUI {
                 "Die Auswahl enthaelt 'Speicher-Integritaet'. Ausschalten bringt mehr Leistung, senkt aber den Schutz vor Schadsoftware.`n`nTrotzdem ausschalten?",
                 "Sicherheitshinweis", 'YesNo', 'Warning')
             if ($warn -ne 'Yes') { $ids = @($ids | Where-Object { $_ -ne 'hvci' }) }
+        }
+        if ($ids -contains 'powerplan' -or $ids -contains 'cpupark' -or $ids -contains 'throttling') {
+            $warn = [System.Windows.Forms.MessageBox]::Show(
+                "Die Auswahl enthaelt Energie-Einstellungen (Energiesparplan / CPU-Mindestleistung / Power Throttling).`n`n" +
+                "Das kann in Spielen etwas bringen, erhoeht aber den Stromverbrauch - auch im Leerlauf, je nach PC um ca. 10-50 W.`n" +
+                "Bei Laptops sinkt die Akkulaufzeit. 'Alles zuruecksetzen' stellt den alten Zustand wieder her.`n`nTrotzdem setzen?",
+                "Hinweis Stromverbrauch", 'YesNo', 'Warning')
+            if ($warn -ne 'Yes') { $ids = @($ids | Where-Object { $_ -notin @('powerplan', 'cpupark', 'throttling') }) }
         }
         if ($ids.Count -eq 0) { return }
         $tuningInfo.Text = "Optimiere Auswahl ..."

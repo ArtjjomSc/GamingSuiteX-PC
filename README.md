@@ -17,7 +17,7 @@
 | Bereich | Was es macht |
 |---|---|
 | **Dashboard & Live-Monitor** | CPU, GPU, RAM, Laufwerke, Netzwerk und Temperaturen live, mit Verlaufskurven |
-| **Optimizer** | Hardware-Diagnose (BIOS-Alter, Treiber, XMP/EXPO, Resizable BAR, SSD …) und Gaming-Optimierung per Klick, **mit Backup und „Alles zurücksetzen“** |
+| **Optimizer** | Hardware-Diagnose (BIOS-Alter, Treiber, XMP/EXPO, Resizable BAR, SSD …) und Gaming-Einstellungen zum Ankreuzen, **mit Backup und „Alles zurücksetzen“**. Windows-Dienste werden nie verändert; Einstellungen mit mehr Stromverbrauch sind nur optional |
 | **Spiele-Tuning** | Erkennt automatisch jedes laufende Spiel (Steam, Epic, GOG, Ubisoft, EA, Battle.net, Riot, Xbox) und misst Ø FPS, **1%-Low, 0,1%-Low und Hänger pro Minute**. Gibt konkrete Empfehlungen (GPU-, CPU- oder VRAM-Limit, Frame Generation …) |
 | **Auto-Tuning** | Counter-Strike 2 und Battlefield 6: Grafik wird automatisch auf deine Monitor-Hz eingestellt und nach jeder Messung nachgeregelt |
 | **Spielebibliothek** | Alle installierten Spiele, per Knopf starten und messen |
@@ -52,7 +52,7 @@
 
 ## Sicherheit & Datenschutz
 
-- **Ohne Gewähr.** Der Optimizer ändert Windows-Einstellungen wie Energiesparplan, Registry und Netzwerk. Vor jeder Änderung wird ein Backup angelegt, und **„Alles zurücksetzen“** stellt den Originalzustand wieder her. Im Zweifel vorher einen Wiederherstellungspunkt anlegen.
+- **Ohne Gewähr.** Der Optimizer ändert nur Einstellungen, die du bestätigst (Registry, auf Wunsch Energiesparplan und Netzwerk). Dienste wie Druckerwarteschlange oder Windows-Suche werden **nicht** angefasst. Energiesparplan „Höchstleistung“, CPU-Mindestleistung 100 % und Power Throttling sind nur optional, weil sie den Stromverbrauch auch im Leerlauf erhöhen (je nach PC ca. 10–50 W). Vor jeder Änderung wird ein Backup angelegt, und **„Alles zurücksetzen“** stellt den Originalzustand wieder her. Im Zweifel vorher einen Wiederherstellungspunkt anlegen.
 - **„Alles optimieren“** ändert nur unkritische Einstellungen:
   - Die Mausbeschleunigung und die Netzwerk-Tweaks sind **optional** und werden nur einzeln per Haken gesetzt.
   - Die **Speicher-Integrität** (Kernisolierung) wird nie automatisch geändert. Sie hat einen eigenen Knopf mit Warnung, denn das Ausschalten senkt die Sicherheit von Windows.
