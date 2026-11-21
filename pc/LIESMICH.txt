@@ -1,0 +1,27 @@
+GAMINGSUITE X 11.4 - Kurzanleitung
+==================================
+
+VORAUSSETZUNGEN
+- Windows 10 (ab 1709) oder Windows 11
+- Grafikkarte NVIDIA, AMD oder Intel (GPU-Auslastung bei allen;
+  GPU-Temperatur bei AMD/Intel und CPU-Temperatur nur mit LibreHardwareMonitor)
+
+STARTEN
+1. Ordner entpacken, z. B. nach C:\GamingSuiteX
+   (Der Ordner "Modules" muss neben GamingSuiteX.ps1 liegen.)
+2. START_GamingSuiteX.bat doppelklicken.
+   - Administrator-Rechte -> "Ja".
+   - "Windows hat den PC geschuetzt" -> "Weitere Informationen" -> "Trotzdem ausfuehren".
+   - Firewall -> "Private Netzwerke" zulassen (nur fuer Handy/Browser noetig).
+3. Hinweis beim ersten Start lesen und bestaetigen.
+
+HANDY / IPHONE / TABLET
+- Adresse steht unter Settings, z. B. http://192.168.178.20:47801
+- Im Browser oeffnen -> Teilen -> "Zum Home-Bildschirm".
+- Android alternativ: GamingSuiteX.apk installieren.
+- Zugriff unter Settings abschaltbar, optional mit PIN.
+
+PROBLEME?
+Settings -> "Fehlerbericht erstellen" -> ZIP vom Desktop an den Entwickler schicken.
+
+Kostenlos, ohne Gewaehr. Keine Daten werden ins Internet gesendet.
