@@ -8,7 +8,7 @@
 
 | PC-Programm | Handy-App |
 |---|---|
-| ![Dashboard](docs/screenshots/dashboard.png) | <img src="docs/screenshots/app.jpg" width="260"> |
+| ![Dashboard](docs/dashboard.png) | <img src="docs/app.png" width="260"> |
 
 ---
 
