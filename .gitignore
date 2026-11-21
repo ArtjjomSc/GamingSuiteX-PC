@@ -1,0 +1,23 @@
+# Android-Signaturschluessel NIEMALS hochladen
+*.jks
+*.keystore
+key.properties
+
+# Flutter / Android Build-Ausgaben
+mobile/build/
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/android/.gradle/
+mobile/android/local.properties
+*.apk
+*.aab
+
+# Release-Pakete und Fehlerberichte
+*.zip
+GamingSuiteX_Fehlerbericht_*
+
+# System
+Thumbs.db
+desktop.ini
+.DS_Store
