@@ -762,6 +762,7 @@ class _ConnectSheetState extends State<_ConnectSheet> {
   final pc = PcConnection.instance;
   late final TextEditingController _ip =
       TextEditingController(text: pc.host ?? '');
+  late final TextEditingController _pin = TextEditingController(text: pc.pin);
   bool _busy = false;
   List<DiscoveredPc> _found = [];
   String? _msg;
@@ -769,6 +770,7 @@ class _ConnectSheetState extends State<_ConnectSheet> {
   @override
   void dispose() {
     _ip.dispose();
+    _pin.dispose();
     super.dispose();
   }
 
@@ -790,6 +792,7 @@ class _ConnectSheetState extends State<_ConnectSheet> {
 
   Future<void> _connect(String host, [int? port]) async {
     if (host.trim().isEmpty) return;
+    pc.setPin(_pin.text);
     setState(() {
       _busy = true;
       _msg = null;
@@ -858,6 +861,26 @@ class _ConnectSheetState extends State<_ConnectSheet> {
                   borderSide: const BorderSide(color: kAccent)),
             ),
             onSubmitted: (v) => _connect(v),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _pin,
+            keyboardType: TextInputType.number,
+            obscureText: true,
+            maxLength: 8,
+            style: const TextStyle(color: kText),
+            decoration: InputDecoration(
+              labelText: 'PIN (nur falls am PC gesetzt)',
+              labelStyle: const TextStyle(color: kDim),
+              counterText: '',
+              enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: kBorder)),
+              focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: kAccent)),
+            ),
+            onSubmitted: (_) => _connect(_ip.text),
           ),
           const SizedBox(height: 12),
           Row(

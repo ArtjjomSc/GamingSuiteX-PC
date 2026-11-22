@@ -20,8 +20,47 @@ class DiscoveredPc {
 }
 
 class PcConnection extends ChangeNotifier {
-  PcConnection._();
+  PcConnection._() {
+    _loadPin();
+  }
   static final PcConnection instance = PcConnection._();
+
+  /// PIN aus den PC-Einstellungen ("Handy-/Browser-Zugriff"). Leer = keine PIN.
+  String pin = '';
+  int? _lastStatus;
+
+  File get _pinFile =>
+      File('${Directory.systemTemp.parent.path}/gsx_pin.txt');
+
+  void _loadPin() {
+    try {
+      if (_pinFile.existsSync()) pin = _pinFile.readAsStringSync().trim();
+    } catch (_) {}
+  }
+
+  void setPin(String value) {
+    pin = value.trim();
+    try {
+      _pinFile.writeAsStringSync(pin);
+    } catch (_) {}
+  }
+
+  String _failText(String h, int p) {
+    if (_lastStatus == 401) {
+      return pin.isEmpty
+          ? 'Der PC verlangt eine PIN. Bitte unten die PIN aus den '
+              'PC-Einstellungen eingeben.'
+          : 'PIN falsch. Bitte die PIN aus den PC-Einstellungen prüfen.';
+    }
+    if (_lastStatus == 403) {
+      return 'Handy-Zugriff ist am PC ausgeschaltet '
+          '(Einstellungen -> Handy-/Browser-Zugriff).';
+    }
+    if (_lastStatus != null) {
+      return 'PC antwortet mit Fehler HTTP $_lastStatus.';
+    }
+    return 'Keine Verbindung zu $h:$p. Server gestartet? Firewall erlaubt?';
+  }
 
   static const int discoveryPort = 47800;
   static const int defaultPort = 47801;
@@ -159,10 +198,10 @@ class PcConnection extends ChangeNotifier {
     error = null;
     _setState(PcState.connecting);
 
+    _lastStatus = null;
     final ok = await _poll();
     if (!ok) {
-      error = 'Keine Verbindung zu $h:$p. Server gestartet? '
-          'Firewall erlaubt?';
+      error = _failText(h, p);
       _setState(PcState.offline);
       return false;
     }
@@ -212,7 +251,9 @@ class PcConnection extends ChangeNotifier {
       _failures++;
       if (state == PcState.online && _failures >= 3) {
         state = PcState.lost;
-        error = 'Verbindung zum PC unterbrochen ...';
+        error = (_lastStatus == 401 || _lastStatus == 403)
+            ? _failText(host ?? '', port)
+            : 'Verbindung zum PC unterbrochen ...';
         notifyListeners();
       }
       // Nach ca. 30 s ohne Antwort aufgeben.
@@ -232,8 +273,11 @@ class PcConnection extends ChangeNotifier {
   Future<Map<String, dynamic>> _getJson(String path) async {
     final uri = Uri(scheme: 'http', host: host, port: port, path: path);
     final req = await _client.getUrl(uri).timeout(const Duration(seconds: 3));
+    if (pin.isNotEmpty) req.headers.set('X-GSX-Pin', pin);
     final res = await req.close().timeout(const Duration(seconds: 3));
+    if (path == '/api/stats') _lastStatus = res.statusCode;
     if (res.statusCode != 200) {
+      await res.drain<void>();
       throw HttpException('HTTP ${res.statusCode}', uri: uri);
     }
     final body = await res

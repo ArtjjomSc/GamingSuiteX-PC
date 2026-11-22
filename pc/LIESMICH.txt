@@ -1,4 +1,4 @@
-GAMINGSUITE X 11.4 - Kurzanleitung
+GAMINGSUITE X 11.5 - Kurzanleitung
 ==================================
 
 VORAUSSETZUNGEN
@@ -16,8 +16,11 @@ STARTEN
 3. Hinweis beim ersten Start lesen und bestaetigen.
 
 HANDY / IPHONE / TABLET
-- Adresse steht unter Settings, z. B. http://192.168.178.20:47801
-- Im Browser oeffnen -> Teilen -> "Zum Home-Bildschirm".
+- Handy und PC muessen im selben WLAN / Heimnetz sein.
+- Im Programm auf "Settings" klicken. Dort stehen ein QR-Code und die Adresse
+  (z. B. http://192.168.178.20:47801).
+- Am Handy die Kamera-App oeffnen und den QR-Code scannen - oder die Adresse
+  im Browser eintippen. Danach: Teilen -> "Zum Home-Bildschirm".
 - Android alternativ: GamingSuiteX.apk installieren.
 - Zugriff unter Settings abschaltbar, optional mit PIN.
 

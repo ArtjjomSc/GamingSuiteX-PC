@@ -1,8 +1,34 @@
 ﻿# ==========================================================
-# GamingSuite X v11.2 - ULTIMATE EDITION
+# GamingSuite X - Startskript
 # ==========================================================
 
 Clear-Host
+
+# Markier-Modus der Konsole abschalten: Ein Klick ins schwarze Fenster
+# wuerde das Programm sonst anhalten ("Auswaehlen" in der Titelleiste).
+try {
+    if (-not ('GSXConsole' -as [type])) {
+        Add-Type -ErrorAction Stop -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class GSXConsole {
+    [DllImport("kernel32.dll")] static extern IntPtr GetStdHandle(int h);
+    [DllImport("kernel32.dll")] static extern bool GetConsoleMode(IntPtr h, out uint m);
+    [DllImport("kernel32.dll")] static extern bool SetConsoleMode(IntPtr h, uint m);
+    public static void DisableQuickEdit() {
+        IntPtr h = GetStdHandle(-10);
+        uint m;
+        if (!GetConsoleMode(h, out m)) return;
+        m &= ~0x0040u;   // ENABLE_QUICK_EDIT_MODE aus
+        m |= 0x0080u;    // ENABLE_EXTENDED_FLAGS
+        SetConsoleMode(h, m);
+    }
+}
+'@
+    }
+    [GSXConsole]::DisableQuickEdit()
+}
+catch { }
 
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
 if (-not $isAdmin) {
@@ -53,6 +79,7 @@ $modules = @(
     "GameTuning.ps1",
     "Support.ps1",
     "UIControls.ps1",
+    "QrCode.ps1",
     "UI.ps1"
 )
 

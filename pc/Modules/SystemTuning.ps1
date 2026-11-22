@@ -353,7 +353,7 @@ $script:TuningDefinitions = @(
 
     @{
         Id = 'mmcss'; Category = 'Latenz'; Name = 'Spiele-Prioritaet (MMCSS)'
-        Recommended = 'Hohe Prioritaet fuer Spiele'; OneClick = $true; Restart = $true
+        Recommended = 'Optional: wirkt nur bei Spielen, die sich bei Windows als Spiel (MMCSS) anmelden - Nutzen ungetestet, selbst messen'; OneClick = $false; Restart = $true
         Check = {
             $resp = Get-GSXRegValue $script:MMCSS_PROFILE 'SystemResponsiveness'
             $prio = Get-GSXRegValue $script:MMCSS_GAMES 'Priority'
@@ -404,7 +404,7 @@ $script:TuningDefinitions = @(
 
     @{
         Id = 'hvci'; Category = 'Sicherheit'; Name = 'Speicher-Integritaet (Kernisolierung)'
-        Recommended = 'Aus = mehr FPS, aber weniger Schutz'; OneClick = $false; Restart = $true
+        Recommended = 'An = Windows-Standard und mehr Schutz vor Schadsoftware. Aus bringt meist nur wenige Prozent FPS'; OneClick = $false; Restart = $true
         Check = {
             $running = $null
             try {
@@ -414,7 +414,7 @@ $script:TuningDefinitions = @(
             catch { }
             $reg = Get-GSXRegValue $script:HVCI_KEY 'Enabled'
             if ($null -eq $running) { return @{ Ok = $null; Current = 'unbekannt' } }
-            $text = if ($running) { 'An (kostet Leistung)' } else { 'Aus' }
+            $text = if ($running) { 'An (Standard, mehr Schutz)' } else { 'Aus (weniger Schutz)' }
             if ($running -and $reg -eq 0) { $text = 'Aus nach Neustart' }
             @{ Ok = (-not $running); Current = $text }
         }
@@ -611,6 +611,7 @@ function Get-GSXTuningReport {
 
         $status = ''
         if ($def.Id -eq 'hvci' -and $r.Ok -eq $false) { $status = 'AN' }
+        elseif ($def.Id -eq 'hvci' -and $r.Ok -eq $true) { $status = 'HINWEIS' }   # Aus = weniger Schutz, nicht als 'erledigt' feiern
         elseif (-not $def.OneClick -and $r.Ok -eq $false) { $status = 'OPTIONAL' }
 
         $items.Add((New-GSXTuningItem $def.Id $def.Category $def.Name $r.Ok $r.Current $def.Recommended $status `

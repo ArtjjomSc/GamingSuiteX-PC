@@ -1203,9 +1203,9 @@ function Start-GamingSuiteUI {
 
     $tuneAllButton.Add_Click({
         $answer = [System.Windows.Forms.MessageBox]::Show(
-            "Es werden nur die risikoarmen Einstellungen gesetzt (Spielmodus, GPU-Planung, Spiele-Prioritaet, Game DVR aus).`n`n" +
+            "Es werden nur die risikoarmen Einstellungen gesetzt (Spielmodus, GPU-Planung, Game DVR aus).`n`n" +
             "NICHT veraendert werden: Energiesparplan, CPU-Mindestleistung, Power Throttling (mehr Stromverbrauch),`n" +
-            "Speicher-Integritaet und die uebrigen optionalen Punkte (Maus, Netzwerk). Windows-Dienste werden nie angefasst.`n" +
+            "Speicher-Integritaet und die uebrigen optionalen Punkte (MMCSS, Maus, Netzwerk). Windows-Dienste werden nie angefasst.`n" +
             "Optionale Punkte kannst du einzeln ankreuzen und mit 'Auswahl optimieren' setzen.`n" +
             "die kannst du einzeln ankreuzen und mit 'Auswahl optimieren' setzen.`n" +
             "Vorher wird ein Backup angelegt - alles laesst sich zuruecksetzen.`n`nFortfahren?",
@@ -1298,7 +1298,7 @@ function Start-GamingSuiteUI {
 
     $storageInfoText = New-Object System.Windows.Forms.Label
     $storageInfoText.Location = New-Object System.Drawing.Point(15,55)
-    $storageInfoText.Size = New-Object System.Drawing.Size(1080,520)
+    $storageInfoText.Size = New-Object System.Drawing.Size(1080,460)
     $storageInfoText.ForeColor = $Colors.Text
     $storageInfoText.Font = New-Object Drawing.Font("Segoe UI",10)
     $storageInfoText.AutoSize = $false
@@ -1307,7 +1307,7 @@ function Start-GamingSuiteUI {
 
     $analyzeCacheButton = New-Object System.Windows.Forms.Button
     $analyzeCacheButton.Text = "Cache analysieren"
-    $analyzeCacheButton.Location = New-Object System.Drawing.Point(15,585)
+    $analyzeCacheButton.Location = New-Object System.Drawing.Point(15,530)
     $analyzeCacheButton.Size = New-Object System.Drawing.Size(210,45)
     $analyzeCacheButton.ForeColor = $Colors.Text
     $analyzeCacheButton.BackColor = $Colors.Card
@@ -1316,7 +1316,7 @@ function Start-GamingSuiteUI {
 
     $clearCacheButton = New-Object System.Windows.Forms.Button
     $clearCacheButton.Text = "Cache leeren"
-    $clearCacheButton.Location = New-Object System.Drawing.Point(235,585)
+    $clearCacheButton.Location = New-Object System.Drawing.Point(235,530)
     $clearCacheButton.Size = New-Object System.Drawing.Size(210,45)
     $clearCacheButton.ForeColor = $Colors.Text
     $clearCacheButton.BackColor = $Colors.Card
@@ -1325,7 +1325,7 @@ function Start-GamingSuiteUI {
 
     $emptyRecycleButton = New-Object System.Windows.Forms.Button
     $emptyRecycleButton.Text = "Papierkorb leeren"
-    $emptyRecycleButton.Location = New-Object System.Drawing.Point(455,585)
+    $emptyRecycleButton.Location = New-Object System.Drawing.Point(455,530)
     $emptyRecycleButton.Size = New-Object System.Drawing.Size(210,45)
     $emptyRecycleButton.ForeColor = $Colors.Text
     $emptyRecycleButton.BackColor = $Colors.Card
@@ -1334,7 +1334,7 @@ function Start-GamingSuiteUI {
 
     $largeFilesButton = New-Object System.Windows.Forms.Button
     $largeFilesButton.Text = "Grosse Dateien finden"
-    $largeFilesButton.Location = New-Object System.Drawing.Point(675,585)
+    $largeFilesButton.Location = New-Object System.Drawing.Point(15,585)
     $largeFilesButton.Size = New-Object System.Drawing.Size(210,45)
     $largeFilesButton.ForeColor = $Colors.Text
     $largeFilesButton.BackColor = $Colors.Card
@@ -1343,7 +1343,7 @@ function Start-GamingSuiteUI {
 
     $duplicatesButton = New-Object System.Windows.Forms.Button
     $duplicatesButton.Text = "Duplikate finden"
-    $duplicatesButton.Location = New-Object System.Drawing.Point(895,585)
+    $duplicatesButton.Location = New-Object System.Drawing.Point(235,585)
     $duplicatesButton.Size = New-Object System.Drawing.Size(210,45)
     $duplicatesButton.ForeColor = $Colors.Text
     $duplicatesButton.BackColor = $Colors.Card
@@ -1352,7 +1352,7 @@ function Start-GamingSuiteUI {
 
     $unusedSoftwareButton = New-Object System.Windows.Forms.Button
     $unusedSoftwareButton.Text = "Groesste Programme"
-    $unusedSoftwareButton.Location = New-Object System.Drawing.Point(15,635)
+    $unusedSoftwareButton.Location = New-Object System.Drawing.Point(455,585)
     $unusedSoftwareButton.Size = New-Object System.Drawing.Size(210,45)
     $unusedSoftwareButton.ForeColor = $Colors.Text
     $unusedSoftwareButton.BackColor = $Colors.Card
@@ -1360,10 +1360,11 @@ function Start-GamingSuiteUI {
     $storagePanel.Controls.Add($unusedSoftwareButton)
 
     function Update-StorageView {
-        $drives = @(Get-StorageInfo)
+        $drives = Get-StorageInfo   # liefert bereits ein Array (kein @() drumherum, sonst wird alles eine Zeile)
         $text = "Laufwerke:`n`n"
         foreach ($drive in $drives) {
-            $text += "$($drive.Drive) $($drive.Label)  -  $($drive.Used) GB / $($drive.Total) GB belegt ($($drive.Percent)%)  -  $($drive.Free) GB frei`n"
+            $label = if ($drive.Label) { " ($($drive.Label))" } else { "" }
+            $text += "$($drive.Drive)$label   $($drive.Used) von $($drive.Total) GB belegt ($($drive.Percent) %)   -   $($drive.Free) GB frei`n"
         }
         $storageInfoText.Text = $text
     }
@@ -1384,6 +1385,10 @@ function Start-GamingSuiteUI {
     })
 
     $emptyRecycleButton.Add_Click({
+        $confirm = [System.Windows.Forms.MessageBox]::Show(
+            "Der Papierkorb wird endgueltig geleert. Geloeschte Dateien lassen sich danach nicht wiederherstellen.`n`nFortfahren?",
+            "Papierkorb leeren", 'YesNo', 'Warning')
+        if ($confirm -ne 'Yes') { return }
         $result = Clear-Recycle
         if ($result) {
             $storageInfoText.Text = "Papierkorb erfolgreich geleert!"
@@ -1463,13 +1468,74 @@ function Start-GamingSuiteUI {
     $settingsText = New-Object System.Windows.Forms.Label
     $settingsText.UseMnemonic = $false
     $settingsText.Location = New-Object System.Drawing.Point(15,55)
-    $settingsText.Size = New-Object System.Drawing.Size(1080,300)
+    $settingsText.Size = New-Object System.Drawing.Size(1080,105)
     $settingsText.ForeColor = $Colors.Text
     $settingsText.Font = New-Object Drawing.Font("Segoe UI",11)
     $settingsPanel.Controls.Add($settingsText)
 
     $script:PhoneAddressText = (@(Get-PhoneServerAddresses) | ForEach-Object { "$($_):47801" }) -join ", "
     if (-not $script:PhoneAddressText) { $script:PhoneAddressText = "keine WLAN/LAN-Adresse gefunden" }
+    $script:PhoneUrl = $null
+    $firstAddr = @(Get-PhoneServerAddresses) | Select-Object -First 1
+    if ($firstAddr) { $script:PhoneUrl = "http://$($firstAddr):47801" }
+
+    # --- Karte: Handy verbinden (fuer Einsteiger: QR-Code + Schritt-fuer-Schritt)
+    $connectCard = New-GSXCard -Fill $Colors.Card -Border $Colors.Border
+    $connectCard.Location = New-Object System.Drawing.Point(15,170)
+    $connectCard.Size = New-Object System.Drawing.Size(1080,180)
+    $settingsPanel.Controls.Add($connectCard)
+
+    $qrBox = New-Object System.Windows.Forms.PictureBox
+    $qrBox.Location = New-Object System.Drawing.Point(18,22)
+    $qrBox.Size = New-Object System.Drawing.Size(136,136)
+    $qrBox.SizeMode = 'Zoom'
+    $qrBox.BackColor = [System.Drawing.Color]::White
+    $qrImage = if ($script:PhoneUrl -and (Get-Command New-GSXQrImage -ErrorAction SilentlyContinue)) { New-GSXQrImage -Text $script:PhoneUrl -PixelSize 4 } else { $null }
+    if ($qrImage) { $qrBox.Image = $qrImage } else { $qrBox.Visible = $false }
+    $connectCard.Controls.Add($qrBox)
+    $connectLeft = if ($qrImage) { 172 } else { 18 }
+
+    $connectTitle = New-Object System.Windows.Forms.Label
+    $connectTitle.Text = "HANDY ODER TABLET VERBINDEN  (iPhone, Android, jeder Browser)"
+    $connectTitle.Location = New-Object System.Drawing.Point($connectLeft,14)
+    $connectTitle.Size = New-Object System.Drawing.Size(880,22)
+    $connectTitle.ForeColor = $Colors.Green
+    $connectTitle.Font = $FontTitle
+    $connectCard.Controls.Add($connectTitle)
+
+    $connectUrl = New-Object System.Windows.Forms.Label
+    $connectUrl.UseMnemonic = $false
+    $connectUrl.Text = if ($script:PhoneUrl) { $script:PhoneUrl } else { "Keine Netzwerkverbindung gefunden - ist der PC mit dem Router verbunden?" }
+    $connectUrl.Location = New-Object System.Drawing.Point($connectLeft,40)
+    $connectUrl.Size = New-Object System.Drawing.Size(560,34)
+    $connectUrl.ForeColor = $Colors.Text
+    $connectUrl.Font = New-Object Drawing.Font("Consolas",18,[Drawing.FontStyle]::Bold)
+    $connectCard.Controls.Add($connectUrl)
+
+    $copyUrlButton = New-Object System.Windows.Forms.Button
+    $copyUrlButton.Text = "Adresse kopieren"
+    $copyUrlButton.Location = New-Object System.Drawing.Point(($connectLeft + 570),40)
+    $copyUrlButton.Size = New-Object System.Drawing.Size(150,32)
+    $copyUrlButton.BackColor = $Colors.Button
+    $copyUrlButton.ForeColor = $Colors.Text
+    $copyUrlButton.Enabled = [bool]$script:PhoneUrl
+    $connectCard.Controls.Add($copyUrlButton)
+    $copyUrlButton.Add_Click({
+        try { [System.Windows.Forms.Clipboard]::SetText($script:PhoneUrl); $copyUrlButton.Text = "Kopiert" } catch { }
+    })
+
+    $connectSteps = New-Object System.Windows.Forms.Label
+    $connectSteps.UseMnemonic = $false
+    $scanHint = if ($qrImage) { "Kamera-App am Handy oeffnen und den QR-Code links scannen - oder die Adresse oben im Browser eintippen." } else { "Die Adresse oben im Browser des Handys eintippen (Safari, Chrome ...)." }
+    $connectSteps.Text =
+        "1.  Handy und PC muessen im selben WLAN / Heimnetz sein.`n" +
+        "2.  $scanHint`n" +
+        "3.  Fuer schnellen Zugriff: im Browser 'Teilen' -> 'Zum Home-Bildschirm'.  Android-App: PC CONNECT -> Automatisch suchen.`n" +
+        "Klappt nicht? PC und Handy im selben WLAN? Beim ersten Start die Windows-Firewall-Frage mit 'Zulassen' beantwortet?"
+    $connectSteps.Location = New-Object System.Drawing.Point($connectLeft,82)
+    $connectSteps.Size = New-Object System.Drawing.Size((1060 - $connectLeft),90)
+    $connectSteps.ForeColor = $Colors.Dim
+    $connectCard.Controls.Add($connectSteps)
 
     # --- Karte: Handy-/Browser-Zugriff
     $phoneCard = New-GSXCard -Fill $Colors.Card -Border $Colors.Border
@@ -1560,15 +1626,11 @@ function Start-GamingSuiteUI {
                        elseif ($state.PhoneServerRunning) { "aktiv" + $(if ($state.PhonePin) { " (mit PIN)" } else { "" }) }
                        elseif ($state.PhoneServerError) { "Fehler: $($state.PhoneServerError)" }
                        else { "startet ..." }
-        $firstIp = ($script:PhoneAddressText -split ',')[0].Trim()
         $settingsText.Text =
-            "GamingSuite X v$Version`n`n" +
+            "GamingSuite X v$Version`n" +
             "Konfiguration: $(Get-ConfigPath)\config.json`n" +
-            "Protokolle: $(Get-LogPath)`n`n" +
-            "HANDY-VERBINDUNG  -  Status: $phoneStatus`n" +
-            "Android-App: PC CONNECT -> Automatisch suchen (oder IP eingeben: $script:PhoneAddressText)`n" +
-            "iPhone / Tablet / jeder Browser: http://$firstIp  ->  Teilen -> Zum Home-Bildschirm`n" +
-            "Handy und PC muessen im selben WLAN sein.`n`n" +
+            "Protokolle: $(Get-LogPath)`n" +
+            "Handy-Zugriff: $phoneStatus     (alle Adressen dieses PCs: $script:PhoneAddressText)`n" +
             "Kostenlos und quelloffen. Es werden keine Daten ins Internet gesendet."
         $phoneEnabledBox.Checked = [bool]$state.PhoneEnabled
         $pinBox.Text = [string]$state.PhonePin
