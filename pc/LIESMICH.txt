@@ -1,4 +1,4 @@
-GAMINGSUITE X 11.5 - Kurzanleitung
+GAMINGSUITE X 11.6 - Kurzanleitung
 ==================================
 
 VORAUSSETZUNGEN

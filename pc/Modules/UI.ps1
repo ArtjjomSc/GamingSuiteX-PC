@@ -876,7 +876,10 @@ function Start-GamingSuiteUI {
             if ($result.FgActive -and $null -ne $result.BaseAvg -and $result.BaseAvg -lt 55 -and $current -gt 1) {
                 $decision = @{ Level = $current - 1; Reason = "Frame Generation aktiv, aber nur $($result.BaseAvg) echte FPS -> eine Stufe runter" }
             }
-            if ($result.HitchesPerMin -gt 10 -and $decision.Level -ge $current -and $current -gt 1) {
+            # Haenger nur dann ueber die Grafikstufe angehen, wenn die GPU wirklich ausgelastet ist
+            # oder der VRAM voll ist - sonst kommen sie von CPU, Streaming oder Shadern.
+            $gpuBusy = ($null -ne $result.GpuAvg -and $result.GpuAvg -ge 80) -or ($null -ne $result.VramPct -and $result.VramPct -ge 90)
+            if ($result.HitchesPerMin -gt 10 -and $gpuBusy -and $decision.Level -ge $current -and $current -gt 1) {
                 $decision = @{ Level = $current - 1; Reason = "$($result.HitchesPerMin) Haenger/Minute -> eine Stufe runter fuer stabilere Frametimes" }
             }
             Add-GtLog "   Auto-Tuning: $($decision.Reason)"

@@ -720,9 +720,16 @@ function Get-GSXFpsAdvice {
     $fgFloor = 55   # unter ~55 echten FPS fuehlt sich Frame Generation traege an
 
     $coreText = if ($null -ne $r.CoreMax) { ", staerkster CPU-Kern $($r.CoreMax) %" } else { "" }
-    $gpuLimit = ($null -ne $r.GpuAvg -and $r.GpuAvg -ge 92)
-    $cpuLimit = ($null -ne $r.CoreMax -and $r.CoreMax -ge 90 -and $null -ne $r.GpuAvg -and $r.GpuAvg -lt 85)
-    $limiter  = (-not $cpuLimit -and $null -ne $r.GpuAvg -and $r.GpuAvg -lt 50 -and ($null -eq $r.CoreMax -or $r.CoreMax -lt 85))
+    # GPU-Last entscheidet: Unter ~80 % bringt "Grafik runter" so gut wie nichts.
+    $gpuKnown = ($null -ne $r.GpuAvg)
+    $gpuLimit = ($gpuKnown -and $r.GpuAvg -ge 90)
+    $gpuIdle  = ($gpuKnown -and $r.GpuAvg -lt 80)
+    # CPU-Limit: GPU nicht ausgelastet und ein Kern stark belastet (Hauptthread des Spiels).
+    # Windows misst pro Kern; der Hauptthread springt zwischen Kernen, daher reichen ~80 %.
+    $cpuLimit = ($gpuIdle -and $null -ne $r.CoreMax -and $r.CoreMax -ge 80)
+    # GPU kaum ausgelastet und kein Kern am Limit -> eher FPS-Limit / V-Sync / Engine
+    $limiter  = ($gpuIdle -and -not $cpuLimit -and $r.GpuAvg -lt 60)
+    $fgSupported = ($FgStatus -and ($FgStatus.Supported -or $FgStatus.State -eq 'on'))
     $vramFull = ($null -ne $r.VramPct -and $r.VramPct -ge 90)
 
     # Bewertung: Haenger pro Minute (Bilder > 50 ms und > 2,5x Median)
@@ -732,7 +739,7 @@ function Get-GSXFpsAdvice {
     if ($hpm -ge 2) {
         $tips.Add("$hpm Haenger pro Minute (Bilder ueber 50 ms) - 1%-Low $($r.LowFps), 0,1%-Low $($r.Low01Fps).")
         if ($vramFull) { $tips.Add("VRAM zu $($r.VramPct) % voll -> Texturqualitaet eine Stufe runter (haeufigste Ursache fuer Nachlade-Haenger).") }
-        if ($cpuLimit) { $tips.Add("CPU-Limit (GPU $($r.GpuAvg) %$coreText) -> Sichtweite, Objekt-/NPC-Dichte, Physik reduzieren; Hintergrundprogramme schliessen.") }
+        if ($cpuLimit) { $tips.Add("CPU-Limit (GPU nur $($r.GpuAvg) %$coreText) -> CPU-lastige Einstellungen runter: Sichtweite, Effekte/Partikel, Physik/Zerstoerung, Objekt-/NPC-Dichte. Hintergrundprogramme schliessen.") }
         if ($limiter)  { $tips.Add("Kein Hardware-Limit (GPU $($r.GpuAvg) %$coreText) - Haenger kommen eher vom Nachladen der Welt (Streaming) oder Shader-Kompilieren.") }
         if (-not $vramFull -and -not $cpuLimit) {
             $tips.Add("Typisch fuer Nachladen/Shader: Spiel auf eine NVMe-SSD legen, NVIDIA-Shader-Cache auf 'Unbegrenzt' lassen.")
@@ -744,9 +751,15 @@ function Get-GSXFpsAdvice {
 
     if ($r.AvgFps -lt $TargetFps * 0.93) {
         if ($gpuLimit) { $tips.Add("GPU-Limit ($($r.GpuAvg) %) -> Schatten, Volumetrik, Raytracing reduzieren oder DLSS eine Stufe staerker.") }
-        elseif ($cpuLimit) { $tips.Add("Ziel $TargetFps FPS wird durch die CPU begrenzt$coreText - Grafik HOCH kostet hier kaum FPS.") }
-        elseif ($limiter) { $tips.Add("FPS-Begrenzung aktiv (GPU nur $($r.GpuAvg) %$coreText): FPS-Limit/V-Sync im Spiel und in der NVIDIA-App pruefen.") }
-        else { $tips.Add("Ziel $TargetFps FPS nicht erreicht -> eine Grafikstufe runter.") }
+        elseif ($cpuLimit) {
+            $tips.Add("CPU-Limit: Die Grafikkarte ist nur zu $($r.GpuAvg) % ausgelastet$coreText. Grafik runter bringt hier so gut wie nichts - Texturen, Schatten und Kantenglaettung koennen hoch bleiben.")
+            $tips.Add("Hilft im CPU-Limit: NVIDIA Reflex auf 'An + Boost' (falls vorhanden) und CPU-lastige Einstellungen eine Stufe runter (Sichtweite, Effekte/Partikel, Physik).")
+            if ($fgSupported -and -not $r.FgActive) { $tips.Add("Frame Generation (falls im Spiel nicht schon an) hilft gerade im CPU-Limit: Die Grafikkarte erzeugt Zwischenbilder ohne Arbeit fuer die CPU.") }
+        }
+        elseif ($limiter) { $tips.Add("Grafikkarte nur zu $($r.GpuAvg) % ausgelastet, aber kein Kern am Limit${coreText}: Meist ist ein FPS-Limit oder V-Sync aktiv (Spiel / NVIDIA-App pruefen). Grafik runter bringt hier nichts.") }
+        elseif ($gpuIdle) { $tips.Add("Grafikkarte nur zu $($r.GpuAvg) % ausgelastet$coreText - die Grenze liegt eher bei CPU oder Spiel-Engine. Grafik runter bringt wenig; eher CPU-lastige Einstellungen (Sichtweite, Effekte, Physik) senken.") }
+        elseif ($gpuKnown) { $tips.Add("Ziel $TargetFps FPS knapp verfehlt (GPU $($r.GpuAvg) %) -> eine Grafikstufe runter oder DLSS eine Stufe staerker.") }
+        else { $tips.Add("Ziel $TargetFps FPS nicht erreicht. GPU-Last unbekannt - erst pruefen, ob die Grafikkarte voll ausgelastet ist, bevor du Grafik reduzierst.") }
     }
     elseif ($hpm -lt 2 -and $null -ne $r.GpuAvg -and $r.GpuAvg -lt 75 -and -not $fg) {
         $tips.Add("Ziel erreicht und GPU nur $($r.GpuAvg) % ausgelastet -> Reserve fuer mehr Grafikqualitaet.")
@@ -984,6 +997,10 @@ function Get-GSXLevelDecision {
 
     # Haenger werden separat ueber Haenger/Minute bewertet (nicht ueber das 1%-Low)
     if ($avg -lt $TargetFps * 0.93) {
+        # Grafikkarte nicht ausgelastet -> CPU/Engine bremst, weniger Grafik bringt nichts
+        if ($null -ne $gpu -and $gpu -lt 80) {
+            return @{ Level = $Level; Reason = "Ø $avg FPS unter Ziel, aber GPU nur $gpu % ausgelastet -> CPU-/Spiel-Limit, Grafikstufe bleibt" }
+        }
         if ($Level -gt 1) { return @{ Level = $Level - 1; Reason = "Ø $avg FPS / 1% $low unter Ziel $TargetFps -> eine Stufe runter" } }
         return @{ Level = $Level; Reason = "Ø $avg FPS unter Ziel, bereits niedrigste Stufe (DLSS im Spiel auf Leistung stellen)" }
     }

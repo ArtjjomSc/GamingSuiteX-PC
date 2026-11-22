@@ -1,5 +1,12 @@
 # Änderungen
 
+## 11.6 – bessere Empfehlungen bei CPU-Limit (nach Nutzer-Feedback)
+
+- Empfiehlt nicht mehr „eine Grafikstufe runter“, wenn die Grafikkarte gar nicht ausgelastet ist. Unter ca. 80 % GPU-Last bringt weniger Grafik so gut wie nichts.
+- CPU-Limit wird jetzt schon erkannt, wenn die GPU unter 80 % liegt und ein CPU-Kern über 80 % (vorher erst ab 90 %).
+- Neue Tipps im CPU-Limit: NVIDIA Reflex „An + Boost“, Frame Generation (falls unterstützt) und gezielt die CPU-lastigen Einstellungen (Sichtweite, Effekte/Partikel, Physik). Texturen, Schatten und Kantenglättung können hoch bleiben.
+- Auto-Tuning (CS2/BF6) senkt die Grafikstufe nicht mehr, wenn die GPU unter 80 % liegt – auch nicht wegen Hängern, außer der Grafikspeicher ist voll.
+
 ## 11.5 – Optimizer zurückhaltender (nach Nutzer-Feedback)
 
 - Alte, ungenutzte Funktion entfernt, die Dienste wie Druckerwarteschlange und Windows-Suche deaktiviert hätte. GamingSuite X verändert keine Windows-Dienste.
