@@ -1,6 +1,6 @@
 # GamingSuite X
 
-**Kostenloses Gaming-Tool für Windows: Hardware-Diagnose, Ein-Klick-Optimierung und FPS-Messung aller Spiele, mit Schwerpunkt auf 1%-Lows. Dazu eine Handy-App bzw. Web-App als Zweitbildschirm.**
+Kostenloses Windows-Tool: misst, wie flüssig deine Spiele wirklich laufen (1%-Lows, Hänger), prüft die Hardware und erklärt die Ursachen verständlich. Mit Handy-/Web-App.
 
 > 🇬🇧 *Free Windows gaming tool: hardware diagnostics, one-click tuning, automatic FPS / 1%-low measurement for every game, plus a phone/web dashboard. UI is currently German only.*
 
