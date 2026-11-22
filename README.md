@@ -2,7 +2,7 @@
 
 Kostenloses Windows-Tool: misst, wie flüssig deine Spiele wirklich laufen (1%-Lows, Hänger), prüft die Hardware und erklärt die Ursachen verständlich. Mit Handy-/Web-App.
 
-> 🇬🇧 *Free Windows gaming tool: hardware diagnostics, one-click tuning, automatic FPS / 1%-low measurement for every game, plus a phone/web dashboard. UI is currently German only.*
+
 
 ## Screenshots
 
